@@ -1,6 +1,6 @@
-namespace Amatsucozy.PMS.Jobs.Orchestrator.Options;
+namespace Amatsucozy.PMS.Jobs.Orchestrator.Core.Options;
 
-public sealed class JobWorker
+public sealed class JobWorkerConfigurations
 {
     public required string WorkerExecutablePath { get; set; }
     
