@@ -10,7 +10,7 @@ public sealed class OrchestratorService
     private readonly ILogger<OrchestratorService> _logger;
     private readonly IOptionsMonitor<JobWorkerConfigurations> _options;
 
-    private static readonly ConcurrentDictionary<int, int> ClientWorkerMapping = new();
+    private static readonly ConcurrentDictionary<int, int> ClientWorkerDictionary = new();
 
     public OrchestratorService(ILogger<OrchestratorService> logger, IOptionsMonitor<JobWorkerConfigurations> options)
     {
@@ -27,14 +27,14 @@ public sealed class OrchestratorService
 
     private void PopulateClientWorkerMapping()
     {
-        if (!ClientWorkerMapping.IsEmpty)
+        if (!ClientWorkerDictionary.IsEmpty)
         {
             return;
         }
 
         foreach (var process in ListAllJobs())
         {
-            ClientWorkerMapping.TryAdd(process.Id, process.Id);
+            ClientWorkerDictionary.TryAdd(process.Id, process.Id);
         }
     }
 
@@ -55,6 +55,7 @@ public sealed class OrchestratorService
                 }
             }
         };
+
         _logger.LogInformation("Starting worker for client {clientId}", clientId);
         workerProcess.Start();
         _logger.LogInformation("Worker for client {clientId} started", clientId);
@@ -64,7 +65,8 @@ public sealed class OrchestratorService
 
     public void Stop(int clientId)
     {
-        var getValueSucceeded = ClientWorkerMapping.TryGetValue(clientId, out var workerId);
+        _logger.LogInformation("Getting worker id for client {clientId}", clientId);
+        var getValueSucceeded = ClientWorkerDictionary.TryGetValue(clientId, out var workerProcessId);
 
         if (!getValueSucceeded)
         {
@@ -72,16 +74,16 @@ public sealed class OrchestratorService
             return;
         }
 
-        _logger.LogInformation("Stopping worker {workerId} for client {clientId}", workerId, clientId);
-        var workerProcess = Process.GetProcessById(workerId);
+        _logger.LogInformation("Stopping worker {workerProcessId} for client {clientId}", workerProcessId, clientId);
+        var workerProcess = Process.GetProcessById(workerProcessId);
         workerProcess.Kill();
-        _logger.LogInformation("Worker {workerId} for client {clientId} stopped", workerId, clientId);
+        _logger.LogInformation("Worker {workerProcessId} for client {clientId} stopped", workerProcessId, clientId);
     }
 
-    public void AddClientWorker(int clientId, int processId)
+    public void AddClientWorker(int clientId, int workerProcessId)
     {
-        _logger.LogInformation("Adding client {clientId} with worker {workerId}", clientId, processId);
-        var addSucceeded = ClientWorkerMapping.TryAdd(clientId, processId);
+        _logger.LogInformation("Adding client {clientId} with worker {workerProcessId}", clientId, workerProcessId);
+        var addSucceeded = ClientWorkerDictionary.TryAdd(clientId, workerProcessId);
 
         if (!addSucceeded)
         {
@@ -89,6 +91,20 @@ public sealed class OrchestratorService
             return;
         }
 
-        _logger.LogInformation("Client {clientId} with worker {workerId} added", clientId, processId);
+        _logger.LogInformation("Client {clientId} with worker {workerProcessId} added", clientId, workerProcessId);
+    }
+    
+    public void RemoveClientWorker(int clientId)
+    {
+        _logger.LogInformation("Removing client {clientId}", clientId);
+        var removeSucceeded = ClientWorkerDictionary.TryRemove(clientId, out _);
+
+        if (!removeSucceeded)
+        {
+            _logger.LogWarning("Client {clientId} does not exist", clientId);
+            return;
+        }
+
+        _logger.LogInformation("Client {clientId} removed", clientId);
     }
 }
