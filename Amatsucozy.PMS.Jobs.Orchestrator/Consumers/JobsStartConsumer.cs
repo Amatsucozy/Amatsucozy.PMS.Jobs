@@ -1,6 +1,7 @@
 using Amatsucozy.PMS.Jobs.Orchestrator.Core;
 using Amatsucozy.PMS.Jobs.Orchestrator.Services;
 using MassTransit;
+using Serilog;
 
 namespace Amatsucozy.PMS.Jobs.Orchestrator.Consumers;
 
@@ -19,10 +20,10 @@ public sealed class JobsStartConsumer : IConsumer<StartJobNotification>
     {
         try
         {
-            _logger.LogInformation("Received start job notification for client {clientId}", context.Message.ClientId);
+            Log.Information("Received start job notification for client {clientId}", context.Message.ClientId);
             var workerProcessId = _service.Start(context.Message.ClientId);
             _service.AddClientWorker(context.Message.ClientId, workerProcessId);
-            _logger.LogInformation("Started worker for client {clientId}", context.Message.ClientId);
+            Log.Information("Started worker for client {clientId}", context.Message.ClientId);
         }
         catch (Exception e)
         {

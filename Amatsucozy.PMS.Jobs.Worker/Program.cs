@@ -1,7 +1,15 @@
+using System.Runtime.InteropServices;
 using Amatsucozy.PMS.Jobs.Worker;
 using Amatsucozy.PMS.Jobs.Worker.Core.Options;
-using Microsoft.Extensions.Configuration.CommandLine;
 using Serilog;
+
+[DllImport("kernel32.dll")]
+static extern bool SetConsoleTitle(string text);
+
+if (args.Any())
+{
+    SetConsoleTitle($"{typeof(Worker).Assembly.GetName().Name} {args[0]}");
+}
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -9,7 +17,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    IHost host = Host.CreateDefaultBuilder(args)
+    var host = Host.CreateDefaultBuilder(args)
         .UseSerilog((hostBuilderContext, loggerConfiguration) =>
         {
             loggerConfiguration.ReadFrom.Configuration(hostBuilderContext.Configuration);

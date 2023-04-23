@@ -1,6 +1,7 @@
 using Amatsucozy.PMS.Jobs.Orchestrator.Core;
 using Amatsucozy.PMS.Jobs.Orchestrator.Services;
 using MassTransit;
+using Serilog;
 
 namespace Amatsucozy.PMS.Jobs.Orchestrator.Consumers;
 
@@ -19,10 +20,10 @@ public sealed class JobsEndConsumer : IConsumer<EndJobNotification>
     {
         try
         {
-            _logger.LogInformation("Received end job notification for client {clientId}", context.Message.ClientId);
+            Log.Information("Received end job notification for client {clientId}", context.Message.ClientId);
             _service.Stop(context.Message.ClientId);
             _service.RemoveClientWorker(context.Message.ClientId);
-            _logger.LogInformation("Stopped worker for client {clientId}", context.Message.ClientId);
+            Log.Information("Stopped worker for client {clientId}", context.Message.ClientId);
         }
         catch (Exception e)
         {

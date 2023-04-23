@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Amatsucozy.PMS.Jobs.Orchestrator.Core.Options;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace Amatsucozy.PMS.Jobs.Orchestrator.Services;
 
@@ -46,9 +47,9 @@ public sealed class OrchestratorService
             {
                 FileName = _options.CurrentValue.WorkerExecutablePath,
                 UseShellExecute = false,
+                WindowStyle = ProcessWindowStyle.Hidden,
                 CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                WorkingDirectory = Path.GetDirectoryName(_options.CurrentValue.WorkerExecutablePath),
                 ArgumentList =
                 {
                     $"ClientId={clientId}"
@@ -56,16 +57,16 @@ public sealed class OrchestratorService
             }
         };
 
-        _logger.LogInformation("Starting worker for client {clientId}", clientId);
+        Log.Information("Starting worker for client {clientId}", clientId);
         workerProcess.Start();
-        _logger.LogInformation("Worker for client {clientId} started", clientId);
+        Log.Information("Worker for client {clientId} started", clientId);
 
         return workerProcess.Id;
     }
 
     public void Stop(int clientId)
     {
-        _logger.LogInformation("Getting worker id for client {clientId}", clientId);
+        Log.Information("Getting worker id for client {clientId}", clientId);
         var getValueSucceeded = ClientWorkerDictionary.TryGetValue(clientId, out var workerProcessId);
 
         if (!getValueSucceeded)
@@ -74,15 +75,15 @@ public sealed class OrchestratorService
             return;
         }
 
-        _logger.LogInformation("Stopping worker {workerProcessId} for client {clientId}", workerProcessId, clientId);
+        Log.Information("Stopping worker {workerProcessId} for client {clientId}", workerProcessId, clientId);
         var workerProcess = Process.GetProcessById(workerProcessId);
         workerProcess.Kill();
-        _logger.LogInformation("Worker {workerProcessId} for client {clientId} stopped", workerProcessId, clientId);
+        Log.Information("Worker {workerProcessId} for client {clientId} stopped", workerProcessId, clientId);
     }
 
     public void AddClientWorker(int clientId, int workerProcessId)
     {
-        _logger.LogInformation("Adding client {clientId} with worker {workerProcessId}", clientId, workerProcessId);
+        Log.Information("Adding client {clientId} with worker {workerProcessId}", clientId, workerProcessId);
         var addSucceeded = ClientWorkerDictionary.TryAdd(clientId, workerProcessId);
 
         if (!addSucceeded)
@@ -91,12 +92,12 @@ public sealed class OrchestratorService
             return;
         }
 
-        _logger.LogInformation("Client {clientId} with worker {workerProcessId} added", clientId, workerProcessId);
+        Log.Information("Client {clientId} with worker {workerProcessId} added", clientId, workerProcessId);
     }
-    
+
     public void RemoveClientWorker(int clientId)
     {
-        _logger.LogInformation("Removing client {clientId}", clientId);
+        Log.Information("Removing client {clientId}", clientId);
         var removeSucceeded = ClientWorkerDictionary.TryRemove(clientId, out _);
 
         if (!removeSucceeded)
@@ -105,6 +106,6 @@ public sealed class OrchestratorService
             return;
         }
 
-        _logger.LogInformation("Client {clientId} removed", clientId);
+        Log.Information("Client {clientId} removed", clientId);
     }
 }

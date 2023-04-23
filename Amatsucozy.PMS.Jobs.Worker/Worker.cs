@@ -1,5 +1,6 @@
 using Amatsucozy.PMS.Jobs.Worker.Core.Options;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace Amatsucozy.PMS.Jobs.Worker;
 
@@ -18,7 +19,7 @@ public class Worker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+            Log.Information("Worker running at: {time}", DateTimeOffset.Now);
             await Task.Delay(10000, stoppingToken);
         }
     }

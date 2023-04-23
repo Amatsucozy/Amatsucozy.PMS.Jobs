@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amatsucozy.PMS.Jobs.Commander", "Amatsucozy.PMS.Jobs.Commander\Amatsucozy.PMS.Jobs.Commander.csproj", "{5E5F88B7-9333-408C-8E77-572FC54B37A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,5 +25,9 @@ Global
 		{25684358-37BF-4CA8-AF1B-5C89A98BEC2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25684358-37BF-4CA8-AF1B-5C89A98BEC2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25684358-37BF-4CA8-AF1B-5C89A98BEC2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E5F88B7-9333-408C-8E77-572FC54B37A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E5F88B7-9333-408C-8E77-572FC54B37A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E5F88B7-9333-408C-8E77-572FC54B37A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E5F88B7-9333-408C-8E77-572FC54B37A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
