@@ -17,8 +17,18 @@ public sealed class JobsStartConsumer : IConsumer<StartJobNotification>
 
     public Task Consume(ConsumeContext<StartJobNotification> context)
     {
-        var workerProcessId = _service.Start(context.Message.ClientId);
-        _service.AddClientWorker(context.Message.ClientId, workerProcessId);
+        try
+        {
+            _logger.LogInformation("Received start job notification for client {clientId}", context.Message.ClientId);
+            var workerProcessId = _service.Start(context.Message.ClientId);
+            _service.AddClientWorker(context.Message.ClientId, workerProcessId);
+            _logger.LogInformation("Started worker for client {clientId}", context.Message.ClientId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while starting worker for client {clientId}", context.Message.ClientId);
+            throw;
+        }
 
         return Task.CompletedTask;
     }

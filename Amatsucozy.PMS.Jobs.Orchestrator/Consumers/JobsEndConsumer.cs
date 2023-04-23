@@ -17,8 +17,18 @@ public sealed class JobsEndConsumer : IConsumer<EndJobNotification>
 
     public Task Consume(ConsumeContext<EndJobNotification> context)
     {
-        _service.Stop(context.Message.ClientId);
-        _service.RemoveClientWorker(context.Message.ClientId);
+        try
+        {
+            _logger.LogInformation("Received end job notification for client {clientId}", context.Message.ClientId);
+            _service.Stop(context.Message.ClientId);
+            _service.RemoveClientWorker(context.Message.ClientId);
+            _logger.LogInformation("Stopped worker for client {clientId}", context.Message.ClientId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while stopping worker for client {clientId}", context.Message.ClientId);
+            throw;
+        }
 
         return Task.CompletedTask;
     }

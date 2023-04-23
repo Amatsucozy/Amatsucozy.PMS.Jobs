@@ -51,7 +51,7 @@ public sealed class OrchestratorService
                 RedirectStandardError = true,
                 ArgumentList =
                 {
-                    clientId.ToString()
+                    $"ClientId={clientId}"
                 }
             }
         };
